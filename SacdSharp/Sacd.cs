@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 
 namespace SacdSharp
 {
@@ -173,7 +175,10 @@ namespace SacdSharp
             if (parts.Length == 2)
             {
                 parts[0] = parts[0].Split('[')[0];
-                pair = new KeyValuePair<string, string>(parts[0], parts[1]);
+                pair = new KeyValuePair<string, string>(
+                    parts[0].Trim(),
+                    parts[1].Trim()
+                );
                 return true;
             }
             pair = default(KeyValuePair<string, string>);
@@ -183,11 +188,52 @@ namespace SacdSharp
 
     public class SacdMetaData : Dictionary<string, string>
     {
+        public SacdMetaData() : base(StringComparer.OrdinalIgnoreCase)
+        {
 
+        }
+
+        public string Title
+        {
+            get
+            {
+                var title = default(string);
+                this.TryGetValue(Constants.TITLE, out title);
+                return title;
+            }
+        }
+
+        public string Artist
+        {
+            get
+            {
+                var title = default(string);
+                this.TryGetValue(Constants.ARTIST, out title);
+                return title;
+            }
+        }
+
+        public string AreaDescription
+        {
+            get
+            {
+                var title = default(string);
+                this.TryGetValue(Constants.AREA_DESCRIPTION, out title);
+                return title;
+            }
+        }
     }
 
     public class SacdAreas : List<SacdArea>
     {
+        public SacdArea this[bool isStereo]
+        {
+            get
+            {
+                return this.FirstOrDefault(area => area.IsStereo == isStereo);
+            }
+        }
+
         internal SacdArea Current { get; set; }
     }
 

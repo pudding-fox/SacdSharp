@@ -114,8 +114,6 @@ apps
 .destiny
 .grunt
 _SpecRunner.html
-source/stash/Logs
 
-#runtime folder
-runtime_env/
-source/.vs/
+#Media
+SacdSharp.Tests/Media/*

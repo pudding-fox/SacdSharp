@@ -14,6 +14,14 @@
 
         public const string STEREO = "Stereo";
 
+        public const string MULTI_CHANNEL = "6ch";
+
         public const string PROCESSING = "Processing";
+
+        public const string ARTIST = "Artist";
+
+        public const string TITLE = "Title";
+
+        public const string COMPLETED = "Completed";
     }
 }
