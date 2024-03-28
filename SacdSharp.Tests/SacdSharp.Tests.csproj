@@ -18,9 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Media\[SACD-R] Alan Parsons Project -1976.iso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="Media\[SACD-R] Alan Parsons Project -1984.iso">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

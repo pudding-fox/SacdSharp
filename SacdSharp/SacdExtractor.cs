@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Security.Cryptography;
-using System.Xml;
 
 namespace SacdSharp
 {
@@ -21,9 +19,9 @@ namespace SacdSharp
 
         public SacdTrack Track { get; private set; }
 
-        public bool IsExtracted(string directoryName, out string fileName)
+        public string GetFileName(string directoryName)
         {
-            var name = string.Concat(
+            var fileName = string.Concat(
                 this.Sacd.Album.Title,
                 Path.DirectorySeparatorChar,
                 this.Area.IsStereo ? Constants.STEREO : Constants.MULTI_CHANNEL,
@@ -33,7 +31,12 @@ namespace SacdSharp
                 this.Track.Info.Title,
                 ".dsf"
             );
-            fileName = Path.Combine(directoryName, name);
+            return Path.Combine(directoryName, fileName);
+        }
+
+        public bool IsExtracted(string directoryName, out string fileName)
+        {
+            fileName = this.GetFileName(directoryName);
             return File.Exists(fileName);
         }
 

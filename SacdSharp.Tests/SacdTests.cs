@@ -1,6 +1,5 @@
 ﻿using NUnit.Framework;
 using System.IO;
-using System.Xml.Schema;
 
 namespace SacdSharp.Tests
 {
@@ -21,8 +20,7 @@ namespace SacdSharp.Tests
         [Test]
         public void Test001()
         {
-            var fileName = Path.Combine(Media, "[SACD-R] Alan Parsons Project -1984.iso");
-            var sacd = SacdFactory.Instance.Create(fileName);
+            var sacd = SacdFactory.Instance.Create(Path.Combine(Media, "[SACD-R] Alan Parsons Project -1984.iso"));
             sacd.InitialiseComponent();
             Assert.That(sacd.Disc.Count == 9);
             Assert.That(sacd.Album.Count == 9);
@@ -37,14 +35,19 @@ namespace SacdSharp.Tests
         [TestCase(false, 0, 642564450)]
         public void Test002(bool isStereo, int trackIndex, long length)
         {
-            var fileName = Path.Combine(Media, "[SACD-R] Alan Parsons Project -1984.iso");
-            var sacd = SacdFactory.Instance.Create(fileName);
+            var sacd = SacdFactory.Instance.Create(Path.Combine(Media, "[SACD-R] Alan Parsons Project -1984.iso"));
             sacd.InitialiseComponent();
             var area = sacd.Areas[isStereo];
             var track = area.Tracks[trackIndex];
             var extractor = SacdFactory.Instance.Create(sacd, area, track);
             var directoryName = Path.GetTempPath();
+            var fileName = extractor.GetFileName(directoryName);
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
             var result = extractor.Extract(directoryName, out fileName);
+            Assert.That(result);
             Assert.That(new FileInfo(fileName).Length == length);
             Assert.That(extractor.IsExtracted(directoryName, out fileName));
         }
