@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace SacdSharp
@@ -60,10 +61,22 @@ namespace SacdSharp
                 UseShellExecute = false,
                 CreateNoWindow = true
             };
-            fileName = default(string);
             using (var process = Process.Start(startInfo))
             {
-                var line = default(string);
+                if (!this.Extract(process, out fileName))
+                {
+                    return false;
+                }
+            }
+            return File.Exists(fileName);
+        }
+
+        protected virtual bool Extract(Process process, out string fileName)
+        {
+            var line = default(string);
+            fileName = default(string);
+            try
+            {
                 while ((line = process.StandardOutput.ReadLine()) != null)
                 {
                     if (line.StartsWith(Constants.PROCESSING, StringComparison.OrdinalIgnoreCase))
@@ -89,13 +102,36 @@ namespace SacdSharp
                     }
                     if (this.CancellationTokenSource.IsCancellationRequested)
                     {
-                        process.Close();
-                        return false;
+                        try
+                        {
+                            process.Kill();
+                        }
+                        catch
+                        {
+                            //Nothing can be done.
+                        }
                     }
                 }
                 process.WaitForExit();
+                return true;
             }
-            return File.Exists(fileName);
+            finally
+            {
+                if (this.CancellationTokenSource.IsCancellationRequested)
+                {
+                    if (File.Exists(fileName))
+                    {
+                        try
+                        {
+                            File.Delete(fileName);
+                        }
+                        catch
+                        {
+                            //Nothing can be done.
+                        }
+                    }
+                }
+            }
         }
 
         public void Cancel()

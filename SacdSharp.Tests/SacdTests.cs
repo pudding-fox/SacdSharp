@@ -63,10 +63,15 @@ namespace SacdSharp.Tests
             var extractor = SacdFactory.Instance.Create(sacd, area, track);
             var directoryName = Path.GetTempPath();
             var fileName = extractor.GetFileName(directoryName);
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
             var thread = new Thread(() => extractor.Extract(directoryName, out fileName));
             thread.Start();
             extractor.Cancel();
             thread.Join();
+            Assert.That(!File.Exists(fileName));
         }
     }
 }
