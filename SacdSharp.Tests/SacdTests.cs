@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.IO;
+using System.Threading;
 
 namespace SacdSharp.Tests
 {
@@ -50,6 +51,22 @@ namespace SacdSharp.Tests
             Assert.That(result);
             Assert.That(new FileInfo(fileName).Length == length);
             Assert.That(extractor.IsExtracted(directoryName, out fileName));
+        }
+
+        [Test]
+        public void Test003()
+        {
+            var sacd = SacdFactory.Instance.Create(Path.Combine(Media, "[SACD-R] Alan Parsons Project -1984.iso"));
+            sacd.InitialiseComponent();
+            var area = sacd.Areas[0];
+            var track = area.Tracks[0];
+            var extractor = SacdFactory.Instance.Create(sacd, area, track);
+            var directoryName = Path.GetTempPath();
+            var fileName = extractor.GetFileName(directoryName);
+            var thread = new Thread(() => extractor.Extract(directoryName, out fileName));
+            thread.Start();
+            extractor.Cancel();
+            thread.Join();
         }
     }
 }

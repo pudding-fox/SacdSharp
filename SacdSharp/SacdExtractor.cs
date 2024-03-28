@@ -1,12 +1,20 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 
 namespace SacdSharp
 {
     public class SacdExtractor
     {
-        public SacdExtractor(Sacd sacd, SacdArea area, SacdTrack track)
+        private SacdExtractor()
+        {
+            this.CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(CancellationToken.None);
+        }
+
+        public CancellationTokenSource CancellationTokenSource { get; private set; }
+
+        public SacdExtractor(Sacd sacd, SacdArea area, SacdTrack track) : this()
         {
             this.Sacd = sacd;
             this.Area = area;
@@ -18,6 +26,7 @@ namespace SacdSharp
         public SacdArea Area { get; private set; }
 
         public SacdTrack Track { get; private set; }
+
 
         public string GetFileName(string directoryName)
         {
@@ -78,10 +87,20 @@ namespace SacdSharp
                             }
                         }
                     }
+                    if (this.CancellationTokenSource.IsCancellationRequested)
+                    {
+                        process.Close();
+                        return false;
+                    }
                 }
                 process.WaitForExit();
             }
             return File.Exists(fileName);
+        }
+
+        public void Cancel()
+        {
+            this.CancellationTokenSource.Cancel();
         }
 
         public class Int32EventArgs : EventArgs
